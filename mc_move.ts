@@ -63,7 +63,6 @@ function selectDestination(name: string) {
     }
 
     form[handlerName].onChange(fakeObj);
-
     return true;
   }
 

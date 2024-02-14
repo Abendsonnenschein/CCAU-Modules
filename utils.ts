@@ -13,7 +13,7 @@ export function indexOf(name: string, skip: number): number {
 export function isEmpty(idx: number): boolean {
   const mods: HTMLElement[] = moduleList();
   const thisMod: OptUndHTMLElement = mods[idx].parentElement?.parentElement;
-  return getChild(thisMod, [2, 0])?.children.length == 0;
+  return getChild(thisMod as OptHTMLElement, [2, 0])?.children.length == 0;
 }
 
 export function addButton(

@@ -1,4 +1,5 @@
 import { getChild, overrideConfirm, restoreConfirm } from "./utils";
+import { OptHTMLElement } from "./aliases";
 
 function clickDelete() {
   const nodes: NodeListOf<Element> = document.querySelectorAll(".ui-kyle-menu");
@@ -11,8 +12,19 @@ function clickDelete() {
     }
 
     const menuItem: HTMLElement = menus[i] as HTMLElement;
-    const btn: OptHTMLElement = getChild(menuItem, [8, 0]);
+    const miLen: number = menuItem.children.length;
+    let idx: number = -1;
 
+    for (let j: number = 0; j < miLen; j++) {
+      const child: Element = menuItem.children[j].children[0];
+
+      if (child.getAttribute("title")?.startsWith("Remove")) {
+        idx = j;
+        break;
+      }
+    }
+
+    const btn: OptHTMLElement = getChild(menuItem, [idx, 0]);
     btn?.click();
   }
 }

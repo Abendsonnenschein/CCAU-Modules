@@ -7,6 +7,8 @@ import {
   restoreConfirm,
 } from "./utils";
 
+import { OptHTMLElement } from "./aliases";
+
 function openMenu(idx: number) {
   const mods: HTMLElement[] = moduleList();
   const hpe: OptHTMLElement = mods[idx].parentElement;

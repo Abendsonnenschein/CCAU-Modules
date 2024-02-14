@@ -1,5 +1,6 @@
 import { removeOldDates } from "./dh_remove";
 import { addButton, getChild, indexOf, moduleList } from "./utils";
+import { OptElement, OptHTMLElement } from "./aliases";
 
 function justSubheader() {
   const sel: string = "#add_module_item_select";
@@ -33,6 +34,23 @@ function openMenu(name: string, skip: number) {
   const btn: OptHTMLElement = getChild(hpe, [5, 0, 2]);
 
   if (btn?.getAttribute("aria-label")?.startsWith("Add Content")) {
+    btn?.click();
+  }
+}
+
+function publishAll() {
+  const rows: NodeListOf<Element> = document.querySelectorAll(".ig-row");
+  const len: number = rows.length;
+
+  for (let i: number = 0; i < len; i++) {
+    const rowItem: OptHTMLElement = rows[i] as OptHTMLElement;
+    const label: OptHTMLElement = getChild(rowItem, [2, 0]);
+    const btn: OptHTMLElement = getChild(rowItem, [3, 1, 0]);
+
+    if (!label?.innerText.startsWith("*") || !label?.innerText.endsWith("*")) {
+      continue;
+    }
+
     btn?.click();
   }
 }
@@ -92,11 +110,20 @@ function addDatePrompt() {
     "Week 16": "*April 29 - May 5*",
   };
 
-  if (confirm("Is this course 7B?\n\nOK = Yes\nCancel = No")) {
+  const term: string | null = prompt("Which term? (16, 7A, &c.)", "16");
+
+  if (term === null || term === "" || /[^14678ABW]/.exec(term) !== null) {
+    return;
+  }
+
+  if (term?.endsWith("B")) {
     addDates(datesB);
   } else {
     addDates(datesF);
   }
+
+  // UNSAFETY: Race condition. However, DOM observation doesn't work here.
+  setTimeout(publishAll, 1500);
 }
 
 export function addDatesButton() {
