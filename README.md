@@ -7,8 +7,8 @@
 
 # Usage
 
-1. Delete template pages first! This is done using the extension at https://github.com/Abendsonnenschein/CCAU-Pages
+1. Delete template pages first! This is done using the extension [here](https://github.com/Abendsonnenschein/CCAU-Pages)
 2. Click the Auto-Move button
 3. Click the Remove Empty button
 4. Click the Add Dates button (read the popup)
-5. Move the dates into place. If using 0.1.0, you also need to publish them. 0.1.1 will fix this.
+5. Move the dates into place
