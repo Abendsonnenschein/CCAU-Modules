@@ -1,9 +1,8 @@
 # Installation
 
-1. Install Violentmonkey
+1. Install a userscript extension (I recommend Violentmonkey, or Userscripts for Safari)
 2. Download one of the compiled version in the release, or compile it yourself
-3. Copy/paste into a new Violentmonkey script
-4. Pat yourself on the back for a job well done :p
+3. Pat yourself on the back for a job well done :p
 
 # Usage
 
