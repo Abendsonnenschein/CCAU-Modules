@@ -1,11 +1,11 @@
 import { OptHTMLElement } from "./aliases";
-import { addButton, getChild, indexOf, isEmpty, moduleList } from "./utils";
+import * as u from "./utils";
 
 function openMenu(name: string, skip: number) {
-  const mods: HTMLElement[] = moduleList();
-  const idx: number = indexOf(name, skip);
+  const mods: HTMLElement[] = u.moduleList();
+  const idx: number = u.indexOf(name, skip);
   const hpe: OptHTMLElement = mods[idx].parentElement;
-  const btn: OptHTMLElement = getChild(hpe, [5, 0, 3]);
+  const btn: OptHTMLElement = u.getChild(hpe, [5, 0, 3]);
 
   if (btn?.getAttribute("aria-label")?.startsWith("Manage")) {
     btn?.click();
@@ -23,57 +23,16 @@ function clickMoveContents() {
     }
 
     const menuItem: HTMLElement = menus[i] as HTMLElement;
-    const btn: HTMLElement | null = getChild(menuItem, [2, 0]);
+    const btn: HTMLElement | null = u.getChild(menuItem, [2, 0]);
 
     btn?.click();
   }
 }
 
-function gRHHelp(key: string): boolean {
-  return key.startsWith("__reactEventHandlers");
-}
-
-function getReactHandler(obj: object): string | undefined {
-  const keys: string[] = Object.keys(obj);
-  const rctKey: string | undefined = keys.find(gRHHelp);
-
-  return rctKey;
-}
-
-function selectDestination(name: string) {
-  const sel: string = ".move-select-form";
-  const _form: OptHTMLElement = document.querySelector(sel) as OptHTMLElement;
-  const form: HTMLSelectElement = _form as HTMLSelectElement;
-  const options: HTMLOptionsCollection | null = form?.options;
-  const len: number = options?.length;
-
-  for (let i: number = 0; i < len; i++) {
-    if (options[i].text !== name) {
-      continue;
-    }
-
-    form.selectedIndex = i;
-    form.value = options[i].value;
-
-    const handlerName: string | undefined = getReactHandler(form);
-    const fakeObj = { target: { value: form.value } };
-
-    if (!handlerName) {
-      continue;
-    }
-
-    form[handlerName].onChange(fakeObj);
-    return true;
-  }
-
-  return false;
-}
-
 function moveAll() {
-  const startIdx: number = indexOf("START HERE", 1);
-  const mods: HTMLElement[] = moduleList();
+  const startIdx: number = u.indexOf("START HERE", 1);
+  const mods: HTMLElement[] = u.moduleList();
   const len: number = mods.length;
-  const sel: string = "#move-item-tray-submit-button";
 
   if (startIdx === -1) {
     return;
@@ -82,22 +41,25 @@ function moveAll() {
   for (let i: number = startIdx; i < len; i++) {
     const name: string = mods[i].title;
 
-    if (isEmpty(i)) {
+    if (u.isEmpty(i)) {
+      console.log(`Skipping ${name} because it's empty`);
       continue;
     }
 
     openMenu(name, startIdx);
     clickMoveContents();
 
-    if (!selectDestination(name)) {
+    if (!u.selectDestination(name)) {
+      console.log(`No destination selected for ${name}`);
       continue;
     }
 
-    const btn: OptHTMLElement = document.querySelector(sel) as OptHTMLElement;
-    btn?.click();
+    u.clickButton("#move-item-tray-submit-button");
   }
+
+  u.scrollUp();
 }
 
 export function addMoveButton() {
-  addButton("Auto-Move", "ccau-move", moveAll, ".header-bar-right__buttons");
+  u.addButton("Auto-Move", "ccau-move", moveAll, ".header-bar-right__buttons");
 }

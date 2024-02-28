@@ -1,8 +1,8 @@
 import { removeOldDates } from "./dh_remove";
-import { addButton, getChild, indexOf, moduleList } from "./utils";
+import * as u from "./utils";
 import { OptElement, OptHTMLElement } from "./aliases";
 
-function justSubheader() {
+function defaultToSubheader() {
   const sel: string = "#add_module_item_select";
   const element: OptElement = document.querySelector(sel);
   const select: HTMLSelectElement = element as HTMLSelectElement;
@@ -11,41 +11,14 @@ function justSubheader() {
   options?.forEach((opt) => (opt.value = "context_module_sub_header"));
 }
 
-function setInput(val: string) {
-  const sel: string = "#sub_header_title";
-  const element: OptElement = document.querySelector(sel);
-  const textBox: HTMLInputElement = element as HTMLInputElement;
-
-  textBox.value = val;
-}
-
-function submitAdd() {
-  const sel: string = ".add_item_button";
-  const element: OptElement = document.querySelector(sel);
-  const btn: OptHTMLElement = element as OptHTMLElement;
-
-  btn?.click();
-}
-
-function openMenu(name: string, skip: number) {
-  const mods: HTMLElement[] = moduleList();
-  const idx: number = indexOf(name, skip);
-  const hpe: OptHTMLElement = mods[idx].parentElement;
-  const btn: OptHTMLElement = getChild(hpe, [5, 0, 2]);
-
-  if (btn?.getAttribute("aria-label")?.startsWith("Add Content")) {
-    btn?.click();
-  }
-}
-
 function publishAll() {
   const rows: NodeListOf<Element> = document.querySelectorAll(".ig-row");
   const len: number = rows.length;
 
   for (let i: number = 0; i < len; i++) {
     const rowItem: OptHTMLElement = rows[i] as OptHTMLElement;
-    const label: OptHTMLElement = getChild(rowItem, [2, 0]);
-    const btn: OptHTMLElement = getChild(rowItem, [3, 1, 0]);
+    const label: OptHTMLElement = u.getChild(rowItem, [2, 0]);
+    const btn: OptHTMLElement = u.getChild(rowItem, [3, 1, 0]);
 
     if (!label?.innerText.startsWith("*") || !label?.innerText.endsWith("*")) {
       continue;
@@ -55,12 +28,41 @@ function publishAll() {
   }
 }
 
-function addDates(dateSet: { [key: string]: string }) {
-  removeOldDates();
-  justSubheader();
+function updateDates() {
+  const now: number = Date.now();
+  const last: number = Number(localStorage.getItem("ccau-updated")) ?? 0;
+  const url: string =
+    "https://raw.githubusercontent.com/Abendsonnenschein/CCAU-Modules/main/dates.json";
 
-  let endIdx: number = indexOf("START HERE", 1);
-  const mods: HTMLElement[] = moduleList();
+  if (now - last < 0x9a7ec800) {
+    return;
+  }
+
+  fetch(url)
+    .then((response) => response.json())
+    .then((data) => {
+      localStorage.setItem("ccau-dates", JSON.stringify(data));
+      localStorage.setItem("ccau-updated", now.toString());
+    });
+}
+
+function openMenu(name: string, btnIdx: number, label: string) {
+  const mods: HTMLElement[] = u.moduleList();
+  const idx: number = u.indexOf(name, 0);
+  const hpe: OptHTMLElement = mods[idx].parentElement;
+  const btn: OptHTMLElement = u.getChild(hpe, [5, 0, btnIdx]);
+
+  if (btn?.getAttribute("aria-label")?.startsWith(label)) {
+    btn?.click();
+  }
+}
+
+async function addDates(dateSet: { [key: string]: string }) {
+  removeOldDates();
+  defaultToSubheader();
+
+  let endIdx: number = u.indexOf("START HERE", 1);
+  const mods: HTMLElement[] = u.moduleList();
 
   if (endIdx === -1) {
     endIdx = mods.length;
@@ -70,64 +72,69 @@ function addDates(dateSet: { [key: string]: string }) {
     const name = mods[i].title;
 
     if (!dateSet[name]) {
+      console.log(`No date found for ${name}`);
       continue;
     }
 
-    openMenu(name, 0);
-    setInput(dateSet[name]);
-    submitAdd();
+    openMenu(name, 2, "Add Content");
+    u.setInput("#sub_header_title", dateSet[name]);
+    u.clickButton(".add_item_button");
   }
 }
 
-function addDatePrompt() {
-  const datesB = {
-    "Week 1": "*March 4 - 10*",
-    "Week 2": "*March 11 - 17*",
-    "Week 3": "*March 25 - 31*",
-    "Week 4": "*April 1 - 7*",
-    "Week 5": "*April 8 - 14*",
-    "Week 6": "*April 15 - 21*",
-    "Week 7": "*April 22 - 28*",
-    "Week 8": "*April 29 - May 5*",
-  };
+function semToString(semester: number): string {
+  switch (semester) {
+    case 1:
+      return "Spring";
+    case 2:
+      return "Summer";
+    case 3:
+      return "Fall";
+    default:
+      return "???";
+  }
+}
 
-  const datesF = {
-    "Week 1": "*January 8 - 14*",
-    "Week 2": "*January 15 - 21*",
-    "Week 3": "*January 22 - 28*",
-    "Week 4": "*January 29 - February 4*",
-    "Week 5": "*February 5 - 11*",
-    "Week 6": "*February 12 - 18*",
-    "Week 7": "*February 19 - 25*",
-    "Week 8": "*February 26 - March 3*",
-    "Week 9": "*March 4 - 10*",
-    "Week 10": "*March 11 - 17*",
-    "Week 11": "*March 25 - 31*",
-    "Week 12": "*April 1 - 7*",
-    "Week 13": "*April 8 - 14*",
-    "Week 14": "*April 15 - 21*",
-    "Week 15": "*April 22 - 28*",
-    "Week 16": "*April 29 - May 5*",
-  };
+async function addDatePrompt() {
+  updateDates();
 
-  const term: string | null = prompt("Which term? (16, 7A, &c.)", "16");
+  const cached: string = localStorage.getItem("ccau-dates") ?? "{}";
+  const dates = JSON.parse(cached);
 
-  if (term === null || term === "" || /[^14678ABW]/.exec(term) !== null) {
+  const msg = `Please enter the term for which you would like to add dates.
+    Valid terms are 1, 1B, 2, 2B, 3, 3B.
+    1 = Spring, 2 = Summer, 3 = Fall`;
+
+  const term: string = prompt(msg, "") ?? "";
+
+  if (/^[123]B?$/.exec(term) === null) {
+    console.log("Invalid term entered.");
     return;
   }
 
-  if (term?.endsWith("B")) {
-    addDates(datesB);
-  } else {
-    addDates(datesF);
+  const semester: number = parseInt(term[0], 3);
+  const isB: boolean = term.length === 2;
+  const semDates: string[] = dates[semToString(semester)];
+  const start: number = isB ? 8 : 0;
+  const increment: number = isB ? -7 : 1;
+  const dict: { [key: string]: string } = {};
+
+  if (!semDates) {
+    console.log("No dates found for this semester.");
+    return;
   }
 
-  // UNSAFETY: Race condition. However, DOM observation doesn't work here.
-  setTimeout(publishAll, 1500);
+  for (let i = 0; i < semDates.length; i++) {
+    dict[`Week ${i + 1}`] = semDates[start + i * increment];
+  }
+
+  addDates(dict);
+  await u.delayedFunc(publishAll, 1.5);
+  await u.delayedFunc(u.scrollUp, 2);
 }
 
 export function addDatesButton() {
-  addButton(
+  u.addButton(
     "Add Dates",
     "ccau-dates",
     addDatePrompt,
