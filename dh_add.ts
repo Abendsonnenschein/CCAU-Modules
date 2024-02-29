@@ -112,11 +112,10 @@ async function addDatePrompt() {
     return;
   }
 
-  const semester: number = parseInt(term[0], 3);
+  const semester: number = parseInt(term[0], 10);
   const isB: boolean = term.length === 2;
   const semDates: string[] = dates[semToString(semester)];
   const start: number = isB ? 8 : 0;
-  const increment: number = isB ? -7 : 1;
   const dict: { [key: string]: string } = {};
 
   if (!semDates) {
@@ -125,8 +124,10 @@ async function addDatePrompt() {
   }
 
   for (let i = 0; i < semDates.length; i++) {
-    dict[`Week ${i + 1}`] = semDates[start + i * increment];
+    dict[`Week ${i + 1}`] = semDates[start + i];
   }
+
+  console.log(dict);
 
   addDates(dict);
   await u.delayedFunc(publishAll, 1.5);
