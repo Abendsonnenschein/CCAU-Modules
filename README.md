@@ -11,3 +11,8 @@
 3. Click the Remove Empty button
 4. Click the Add Dates button (read the popup)
 5. Move the dates into place
+
+# Legal
+
+This code officially belongs to my former employer, so it might get taken down at some point.
+Recommend cloning locally or using the GreasyFork version, which is an AGPL-compliant derivative.
