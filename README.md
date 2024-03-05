@@ -15,4 +15,4 @@
 # Legal
 
 This code officially belongs to my employer, so it might get taken down at some point.
-Recommend cloning locally (host on Gogs/Gitea/Gitee) or using the GreasyFork version.
+Recommend cloning locally (host on Gogs/Gitea/Gitee) or using the [GreasyFork version](https://greasyfork.org/da/scripts/488559-ccau-modules-section).
