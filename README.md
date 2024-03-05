@@ -14,5 +14,5 @@
 
 # Legal
 
-This code officially belongs to my former employer, so it might get taken down at some point.
-Recommend cloning locally or using the GreasyFork version, which is an AGPL-compliant derivative.
+This code officially belongs to my employer, so it might get taken down at some point.
+Recommend cloning locally (host on Gogs/Gitea/Gitee) or using the GreasyFork version.
