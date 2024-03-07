@@ -6,8 +6,35 @@ export function moduleList(): HTMLElement[] {
   return mods;
 }
 
+export function lenientName(name: string): string | null {
+  const ln: string = name.toLowerCase();
+  const stdFmt: RegExp = /^week \d{1,2}$/;
+  const modFmt: RegExp = /^module \d{1,2}$/;
+  const wtfFmt: RegExp = /^week \d{1,2}:/;
+
+  if (ln === "start here") {
+    return "START HERE";
+  }
+
+  if (stdFmt.test(ln)) {
+    return ln.replace("w", "W");
+  }
+
+  if (modFmt.test(ln)) {
+    return ln.replace("module", "Week");
+  }
+
+  if (wtfFmt.test(ln)) {
+    return ln.split(":")[0].replace("w", "W");
+  }
+
+  return null;
+}
+
 export function indexOf(name: string, skip: number): number {
-  return moduleList().findIndex((m, i) => i >= skip && m.title === name);
+  return moduleList().findIndex(
+    (m, i) => i >= skip && m.title.toLowerCase() === name.toLowerCase(),
+  );
 }
 
 export function isEmpty(idx: number): boolean {
@@ -32,11 +59,10 @@ export function addButton(
   btn?.addEventListener("click", fn, false);
 }
 
-//SAFETY: I have checked Canvas code, no RC unless some other extension interferes
 export function overrideConfirm(): () => boolean {
   const orig: () => boolean = window.confirm;
 
-  window.confirm = function () {
+  window.confirm = function() {
     return true;
   };
 
@@ -143,4 +169,8 @@ export function scrollUp() {
 
 export async function delayedFunc(func: () => void, secs: number) {
   setTimeout(func, secs * 1000);
+}
+
+export function log(msg: string) {
+  console.log("[CCAU] " + msg);
 }

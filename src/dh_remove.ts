@@ -2,7 +2,7 @@ import * as u from "./utils";
 import { OptHTMLElement } from "./aliases";
 
 function clickDelete(nm: string) {
-  console.log(`Removing ${nm}`);
+  u.log(`Removing ${nm}`);
 
   const nodes: NodeListOf<Element> = document.querySelectorAll(".ui-kyle-menu");
   const menus: Element[] = Array.from(nodes);

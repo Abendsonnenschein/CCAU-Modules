@@ -29,35 +29,42 @@ function clickMoveContents() {
   }
 }
 
-function moveAll() {
+async function moveAll() {
   const startIdx: number = u.indexOf("START HERE", 1);
   const mods: HTMLElement[] = u.moduleList();
   const len: number = mods.length;
 
   if (startIdx === -1) {
+    u.log("START HERE not found. Please add it to fix.");
     return;
   }
 
   for (let i: number = startIdx; i < len; i++) {
-    const name: string = mods[i].title;
+    const title: string = mods[i].title;
+    const name: string | null = u.lenientName(title);
 
-    if (u.isEmpty(i)) {
-      console.log(`Skipping ${name} because it's empty`);
+    if (!name) {
+      u.log(`${title} has an invalid name.`);
       continue;
     }
 
-    openMenu(name, startIdx);
+    if (u.isEmpty(i)) {
+      u.log(`Skipping ${name} because it's empty`);
+      continue;
+    }
+
+    openMenu(title, startIdx);
     clickMoveContents();
 
     if (!u.selectDestination(name)) {
-      console.log(`No destination selected for ${name}`);
+      u.log(`No destination selected for ${name}`);
       continue;
     }
 
     u.clickButton("#move-item-tray-submit-button");
   }
 
-  u.scrollUp();
+  await u.delayedFunc(u.scrollUp, 2);
 }
 
 export function addMoveButton() {

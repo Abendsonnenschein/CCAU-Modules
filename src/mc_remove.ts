@@ -28,7 +28,7 @@ function clickDelete() {
   }
 }
 
-function removeEmpty() {
+async function removeEmpty() {
   const orig: () => boolean = u.overrideConfirm();
   const mods: HTMLElement[] = u.moduleList();
   const len: number = mods.length;
@@ -43,7 +43,7 @@ function removeEmpty() {
   }
 
   u.restoreConfirm(orig);
-  u.scrollUp();
+  await u.delayedFunc(u.scrollUp, 2);
 }
 
 export function addRemoveButton() {

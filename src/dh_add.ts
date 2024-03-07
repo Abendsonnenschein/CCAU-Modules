@@ -24,17 +24,20 @@ function publishAll() {
       continue;
     }
 
+    u.log(`Publishing ${label}`);
     btn?.click();
   }
 }
 
 function updateDates() {
+  const week: number = 604800000;
   const now: number = Date.now();
   const last: number = Number(localStorage.getItem("ccau-updated")) ?? 0;
   const url: string =
     "https://raw.githubusercontent.com/Abendsonnenschein/CCAU-Modules/main/dates.json";
 
-  if (now - last < 0x9a7ec800) {
+  if (now - last < week) {
+    u.log("To force an update, clear localStorage and refresh the page.");
     return;
   }
 
@@ -65,18 +68,25 @@ async function addDates(dateSet: { [key: string]: string }) {
   const mods: HTMLElement[] = u.moduleList();
 
   if (endIdx === -1) {
+    u.log("Course not detected as a copy, updating all modules.");
     endIdx = mods.length;
   }
 
   for (let i = 0; i < endIdx; i++) {
-    const name = mods[i].title;
+    const title: string = mods[i].title;
+    const name: string | null = u.lenientName(title);
 
-    if (!dateSet[name]) {
-      console.log(`No date found for ${name}`);
+    if (!name) {
+      u.log(`${title} has an invalid name.`);
       continue;
     }
 
-    openMenu(name, 2, "Add Content");
+    if (!dateSet[name]) {
+      u.log(`No date found for ${name}`);
+      continue;
+    }
+
+    openMenu(title, 2, "Add Content");
     u.setInput("#sub_header_title", dateSet[name]);
     u.clickButton(".add_item_button");
   }
@@ -108,7 +118,7 @@ async function addDatePrompt() {
   const term: string = prompt(msg, "") ?? "";
 
   if (/^[123]B?$/.exec(term) === null) {
-    console.log("Invalid term entered.");
+    u.log("Invalid term entered.");
     return;
   }
 
@@ -119,7 +129,7 @@ async function addDatePrompt() {
   const dict: { [key: string]: string } = {};
 
   if (!semDates) {
-    console.log("No dates found for this semester.");
+    u.log("No dates found for this semester.");
     return;
   }
 
@@ -127,9 +137,8 @@ async function addDatePrompt() {
     dict[`Week ${i + 1}`] = semDates[start + i];
   }
 
-  console.log(dict);
-
   addDates(dict);
+
   await u.delayedFunc(publishAll, 1.5);
   await u.delayedFunc(u.scrollUp, 2);
 }
