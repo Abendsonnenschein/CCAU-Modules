@@ -1,18 +1,17 @@
 import * as u from "../utils";
+import { DATE_URL } from "../env";
 
 function autoupdate() {
   const week: number = 0x240c8400;
   const now: number = Date.now();
   const last: number = Number(localStorage.getItem("ccau-updated")) ?? 0;
-  const url: string =
-    "https://raw.githubusercontent.com/Abendsonnenschein/CCAU-Modules/main/dates.json";
 
   if (now - last < week) {
     u.log("To force an update, clear localStorage and refresh the page.");
     return;
   }
 
-  fetch(url)
+  fetch(DATE_URL)
     .then((response) => response.json())
     .then((data) => {
       localStorage.setItem("ccau-dates", JSON.stringify(data));

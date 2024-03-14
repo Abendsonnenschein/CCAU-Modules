@@ -3,6 +3,7 @@ import { Option } from "../option";
 import { actOnDates } from "./utils";
 import { removeOldDates } from "./del";
 import { getDates } from "./update";
+import { lenientName } from "../env";
 
 function defaultToSubheader() {
   const sel: string = "#add_module_item_select";
@@ -43,7 +44,7 @@ function addDates() {
 
   for (let i = 0; i < endIdx; i++) {
     const title: string = mods[i].title;
-    const name: string | null = u.lenientName(title);
+    const name: Option<string> = lenientName(title);
 
     if (!name) {
       u.log(`${title} has an invalid name.`);
@@ -55,7 +56,7 @@ function addDates() {
       continue;
     }
 
-    u.openMenu(title, 2, "Add Content");
+    u.openMenu(u.indexOf(name), 2);
     setInput("#sub_header_title", dates[name]);
     u.clickButton(".add_item_button");
   }

@@ -46,26 +46,6 @@ export function indexOf(name: string, skip: number = 0): number {
   );
 }
 
-export function lenientName(name: string): string | null {
-  const ln: string = name.toLowerCase();
-  const idealFmt: RegExp = /^week \d{1,2}$/;
-  const dateFmt: RegExp = /^week \d{1,2}:/;
-
-  if (ln === "start here") {
-    return "START HERE";
-  }
-
-  if (idealFmt.test(ln)) {
-    return ln.replace("w", "W");
-  }
-
-  if (dateFmt.test(ln)) {
-    return ln.split(":")[0].replace("w", "W");
-  }
-
-  return null;
-}
-
 export function log(msg: string) {
   console.log("[CCAU] " + msg);
 }
@@ -76,23 +56,12 @@ export function moduleList(): HTMLElement[] {
   return mods;
 }
 
-export function openMenu(
-  name: string,
-  btnIdx: number,
-  label: string,
-  skip: number = 0,
-) {
+export function openMenu(idx: number, btnIdx: number) {
   const mods: HTMLElement[] = moduleList();
-  const idx: number = indexOf(name, skip);
   const hpe: Option<HTMLElement> = mods[idx].parentElement;
   const btn: Option<HTMLElement> = getChild(hpe, [5, 0, btnIdx]);
-  const albl: Option<string> = btn?.getAttribute("aria-label");
 
-  if (albl?.startsWith(label)) {
-    btn?.click();
-  } else {
-    log(`Button at CI path [5, 0, ${btnIdx}] is ${albl}; expected ${label}`);
-  }
+  btn?.click();
 }
 
 export function overrideConfirm(): () => boolean {

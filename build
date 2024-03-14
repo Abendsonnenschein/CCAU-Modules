@@ -1,6 +1,8 @@
 #!/bin/sh
 
+rm -r dist &> /dev/null
 rm -r out &> /dev/null
+
 mkdir out
 
 tsc --pretty --strict --removeComments

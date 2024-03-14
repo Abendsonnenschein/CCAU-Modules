@@ -22,7 +22,7 @@ function clickDelete(nm: string) {
   }
 }
 
-// [3, 2, 1, -1, 0] is the CI path for the delete button, where -1 is the last child
+// [3, 2, 1, -1, 0] is the child-index path for the delete button, where -1 is the last child
 
 export function removeOldDates() {
   const orig: () => boolean = u.overrideConfirm();
