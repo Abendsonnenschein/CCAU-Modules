@@ -1,8 +1,9 @@
-import * as u from "./utils";
-import { OptHTMLElement } from "./aliases";
+import { actOnDates } from "./utils";
+import { Option } from "../option";
+import * as u from "../utils";
 
 function clickDelete(nm: string) {
-  u.log(`Removing ${nm}`);
+  u.log(`Removing date header: ${nm}`);
 
   const nodes: NodeListOf<Element> = document.querySelectorAll(".ui-kyle-menu");
   const menus: Element[] = Array.from(nodes);
@@ -15,14 +16,16 @@ function clickDelete(nm: string) {
 
     const menuItem: HTMLElement = menus[i] as HTMLElement;
     const miLen: number = menuItem.children.length;
-    const btn: OptHTMLElement = u.getChild(menuItem, [miLen - 1, 0]);
+    const btn: Option<HTMLElement> = u.getChild(menuItem, [miLen - 1, 0]);
 
     btn?.click();
   }
 }
 
+// [3, 2, 1, -1, 0] is the child-index path for the delete button, where -1 is the last child
+
 export function removeOldDates() {
   const orig: () => boolean = u.overrideConfirm();
-  u.actOnDates(clickDelete);
+  actOnDates([3, 2, 1, -1, 0], clickDelete);
   u.restoreConfirm(orig);
 }
