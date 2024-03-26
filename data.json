@@ -1,0 +1,31 @@
+{
+  "dates": {
+    "Summer": [
+      "*May 6 - May 12*",
+      "*May 13 - May 19*",
+      "*May 20 - May 26*",
+      "*May 27 - June 2*",
+      "*June 3 - June 9*",
+      "*June 10 - June 16*",
+      "*June 17 - June 23*",
+      "*June 24 - June 30*",
+      "*July 1 - July 7*",
+      "*July 8 - July 14*",
+      "*July 15 - July 21*",
+      "*July 22 - July 28*",
+      "*July 29 - August 4*",
+      "*August 5 - August 11*"
+    ]
+  },
+
+  "ranges": {
+    "Summer": {
+      "14": "1-14",
+      "7A": "1-7",
+      "7B": "8-14",
+      "8": "5-12",
+      "4A": "5-8",
+      "4B": "9-12"
+    }
+  }
+}

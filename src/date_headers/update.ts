@@ -1,10 +1,12 @@
 import * as u from "../utils";
 import { DATE_URL } from "../env";
+import { Option } from "../option";
+import { showModal } from "./modal";
 
-function autoupdate() {
+function update() {
   const week: number = 0x240c8400;
   const now: number = Date.now();
-  const last: number = Number(localStorage.getItem("ccau-updated")) ?? 0;
+  const last: number = Number(localStorage.getItem("ccau_update_time")) ?? 0;
 
   if (now - last < week) {
     u.log("To force an update, clear localStorage and refresh the page.");
@@ -14,57 +16,79 @@ function autoupdate() {
   fetch(DATE_URL)
     .then((response) => response.json())
     .then((data) => {
-      localStorage.setItem("ccau-dates", JSON.stringify(data));
-      localStorage.setItem("ccau-updated", now.toString());
+      localStorage.setItem("ccau_data", JSON.stringify(data));
+      localStorage.setItem("ccau_update_time", now.toString());
     });
 }
 
-function resolveSemester(semester: number): string {
-  switch (semester) {
-    case 1:
-      return "Spring";
-    case 2:
-      return "Summer";
-    case 3:
-      return "Fall";
-    case 4:
-      return "Winter";
-    default:
-      return "???";
+function getRawDates(sem: string): Option<string[]> {
+  const cached: string = localStorage.getItem("ccau_data") ?? "{}";
+  const data = JSON.parse(cached);
+  const dates: string[] = data["dates"][sem];
+
+  if (!dates) {
+    u.log("No dates found for this term.");
+    return null;
   }
+
+  return dates;
 }
 
-export function getDates(): { [key: string]: string } {
-  autoupdate();
+function getDateRange(sem: string, term: string): Option<string> {
+  const cached: string = localStorage.getItem("ccau_data") ?? "{}";
+  const data = JSON.parse(cached);
+  const ret: Option<string> = data["ranges"][sem][term];
 
-  const cached: string = localStorage.getItem("ccau-dates") ?? "{}";
-  const dates = JSON.parse(cached);
-
-  const msg = `Please enter the term for which you would like to add dates.
-    Valid terms are 1, 1B, 2, 2B, 3, 3B.
-    1 = Spring, 2 = Summer, 3 = Fall`;
-
-  const term: string = prompt(msg, "") ?? "";
-
-  if (/^[123]B?$/.exec(term) === null) {
-    u.log("Invalid term entered.");
-    return {};
+  if (!ret) {
+    u.log("No date range found for this term.");
+    return null;
   }
 
-  const semester: number = parseInt(term[0], 10);
-  const isB: boolean = term.length === 2;
-  const semDates: string[] = dates[resolveSemester(semester)];
-  const start: number = isB ? 8 : 0;
+  return ret;
+}
+
+function datesInRange(dates: string[], range: string): string[] {
+  return range.split(",").flatMap((r: string) => {
+    const nums: number[] = r.split("-").map(Number);
+    const start: number = nums[0];
+    const end: Option<number> = nums[1];
+
+    return dates.slice(start - 1, end || start);
+  });
+}
+
+function mapToWeeks(dates: string[]): { [key: string]: string } {
   const dict: { [key: string]: string } = {};
 
-  if (!semDates) {
-    u.log("No dates found for this semester.");
-    return {};
-  }
-
-  for (let i = 0; i < semDates.length; i++) {
-    dict[`Week ${i + 1}`] = semDates[start + i];
+  for (let i = 0; i < dates.length; i++) {
+    dict[`Week ${i + 1}`] = dates[i];
   }
 
   return dict;
+}
+
+export async function getDates(): Promise<{ [key: string]: string }> {
+  return new Promise((resolve) => {
+    update();
+
+    showModal().then(async ([sem, term]) => {
+      if (!sem || !term) {
+        u.log("Semester: " + sem);
+        u.log("Term: " + term);
+        resolve({});
+        return;
+      }
+
+      const rawDates: Option<string[]> = getRawDates(sem);
+      const range: Option<string> = getDateRange(sem, term);
+
+      if (!rawDates || !range) {
+        resolve({});
+        return;
+      }
+
+      const dates: string[] = datesInRange(rawDates, range);
+      resolve(mapToWeeks(dates));
+    });
+  });
 }
