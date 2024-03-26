@@ -3,7 +3,7 @@
 // @namespace   CCAU Suite
 // @description Automate course copies
 // @match       https://*.instructure.com/courses/*/modules
-// @version     0.2.4
+// @version     1.0.0
 // @author      Abendsonnenschein
 // @icon        https://du11hjcvx0uqb.cloudfront.net/br/dist/images/favicon-e10d657a73.ico
 // @grant       none

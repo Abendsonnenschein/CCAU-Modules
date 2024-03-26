@@ -14,8 +14,6 @@ function defaultToSubheader() {
   options?.forEach((opt) => (opt.value = "context_module_sub_header"));
 }
 
-// [3, 1, 0] is the child-index path to the publish button in the .ig-row element
-
 function publish() {
   actOnDates([3, 1, 0], (nm) => {
     u.log(`Publishing ${nm}`);
@@ -29,11 +27,11 @@ function setInput(sel: string, val: string) {
   textBox.value = val;
 }
 
-function addDates() {
+async function addDates() {
   removeOldDates();
   defaultToSubheader();
 
-  const dates: { [key: string]: string } = getDates();
+  const dates: { [key: string]: string } = await getDates();
   const mods: HTMLElement[] = u.moduleList();
   let endIdx: number = u.indexOf("START HERE", 1);
 

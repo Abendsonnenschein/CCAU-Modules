@@ -3,7 +3,7 @@ import { Option } from "./option";
 // Change this URL to one that points to the dates for your university.
 
 export const DATE_URL: string =
-  "https://raw.githubusercontent.com/Abendsonnenschein/CCAU-Modules/main/dates.json";
+  "https://raw.githubusercontent.com/Abendsonnenschein/CCAU-Modules/main/data.json";
 
 // lenientName takes the title of a module and converts it into the expected name format, if possible.
 // E.g., "WEEK 1" -> "Week 1", "Week 1: *January 1 - 8*" -> "Week 1", "Start Here" -> "START HERE", "Resources" -> null.
